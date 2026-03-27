@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>It’s My Playlist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Outfit:wght@300;600&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a14;
+            --accent-purple: #9d50bb;
+            --accent-blue: #6e48aa;
+            --accent-pink: #fbc2eb;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 몽환적 배경 애니메이션 */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1b1b3a 0%, #0a0a14 100%);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .blob-1 { width: 600px; height: 600px; background: var(--accent-purple); top: -10%; left: -10%; }
+        .blob-2 { width: 700px; height: 700px; background: var(--accent-blue); bottom: -15%; right: -10%; animation-duration: 25s; }
+        .blob-3 { width: 500px; height: 500px; background: var(--accent-pink); top: 30%; left: 30%; animation-duration: 30s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: -3px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-pink) 50%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 10px 40px rgba(157, 80, 187, 0.2);
+        }
+
+        /* 오늘의 추천곡 버튼 스타일 */
+        .random-recommend-section {
+            text-align: center;
+            margin: 40px 0 60px 0;
+        }
+
+        .recommend-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 24px 60px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            border-radius: 100px;
+            cursor: pointer;
+            box-shadow: 0 15px 40px rgba(157, 80, 187, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .label {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-pink);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .artist-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .artist-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            font-size: 0.95rem;
+        }
+
+        .genre-section {
+            margin-bottom: 50px;
+        }
+
+        .genre-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-left: 15px;
+            border-left: 5px solid var(--accent-purple);
+            color: #fff;
+        }
+
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .song-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .song-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-pink);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .album-art {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            background-color: #333; /* Fallback */
+        }
+
+        .album-art::after {
+            content: '▶';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .song-card:hover .album-art::after {
+            opacity: 1;
+        }
+
+        .song-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .song-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-artist {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-bottom: 40px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .genre-header { font-size: 1.4rem; }
+            .recommend-btn { padding: 18px 40px; font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>It’s My Playlist</h1>
+        </header>
+
+        <section class="random-recommend-section">
+            <button class="recommend-btn" onclick="pickRandomSong()">✨ 오늘의 추천곡</button>
+        </section>
+
+        <section class="info-card">
+            <span class="label">내가 좋아하는 장르:</span>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">R&B, 소울, k-pop, pop</p>
+        </section>
+
+        <section class="info-card">
+            <span class="label">내가 좋아하는 아티스트 :</span>
+            <div class="artist-container">
+                <div class="artist-tag">DPR LIVE</div>
+                <div class="artist-tag">woodz</div>
+                <div class="artist-tag">brb.</div>
+                <div class="artist-tag">Thomas Ng</div>
+                <div class="artist-tag">Sylo</div>
+                <div class="artist-tag">Kiana Ledé</div>
+                <div class="artist-tag">UMI</div>
+                <div class="artist-tag">thuy</div>
+                <div class="artist-tag">keshi</div>
+                <div class="artist-tag">leon</div>
+                <div class="artist-tag">Gemini</div>
+                <div class="artist-tag">데이먼스 이어</div>
+                <div class="artist-tag">카더가든</div>
+                <div class="artist-tag">리도어</div>
+            </div>
+        </section>
+
+        <!-- R&B/Soul Section -->
+        <div class="genre-section">
+            <h2 class="genre-header">R&B/Soul</h2>
+            <div class="playlist-grid">
+                <a href="https://youtu.be/Jg9NbDizoPM?si=rZDdPGU5OgTxYyFn" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">dpr live</span>
+                        <span class="song-title">Jasmine</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/czftJ7E7wa4?si=vc2mHPbJdMmmgVDp" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">dpr live</span>
+                        <span class="song-title">martini blue</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/ybyj215MuL4?si=QBl8sNgbbWXP1bBN" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1614149162883-504ce4d13909?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">brb.</span>
+                        <span class="song-title">undo</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/U7Wod1UVrZ0?si=aXWdhuVq_bZ1dSAj" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1453090927415-5f45085b65c0?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">brb.</span>
+                        <span class="song-title">do me right</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/YMLzwR5aKSg?si=v-yv9tTTYCvtRrbA" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1514525253361-bee8718a300c?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">Thomas Ng</span>
+                        <span class="song-title">IC+B</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/yXZFkuub99s?si=Lvim4H0DldLCgHxO" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">Sylo</span>
+                        <span class="song-title">Fomo</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/0SmfXtH3JTU?si=cXOBg-Wlak9EfN-7" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">Kiana Ledé</span>
+                        <span class="song-title">Title</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/D5qUpJo_Gac?si=mPTcLsJ4k1saoJtT" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">UMI</span>
+                        <span class="song-title">Love Affair</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/LPxgXhu8tTc?si=CyGdNaWYnDj4gE8k" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">thuy</span>
+                        <span class="song-title">figured out</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/i9DHduXUHqI?si=JFuQX0_olBzfLMUX" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1459749411177-042180ce673c?auto=format&fit=crop&q=80&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">keshi</span>
+                        <span class="song-title">kiss me right</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/aMyO6GNkfpo?si=3AM4j53fBtIOyFoC" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1544145945-f9042cd3a0bc?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">keshi</span>
+                        <span class="song-title">beside you</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- k-pop/힙합 Section -->
+        <div class="genre-section">
+            <h2 class="genre-header">k-pop/힙합</h2>
+            <div class="playlist-grid">
+                <a href="https://youtu.be/V-eu0NmPHXQ?si=HM0Mr9W_mVqvXw5" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">woodz</span>
+                        <span class="song-title">심연</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/NjJkdpWsu48?si=oykikxdEiVIP2ObV" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">보이콜드, woodz</span>
+                        <span class="song-title">FINE</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/cnZ3RkQ7y_0?si=PYyXyLRBjGA6A3wJ" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1534536281715-e28d76689b4d?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">leon</span>
+                        <span class="song-title">1225</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/8zddLHk13aI?si=gCvW4HIATKM0LNCq" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">Gemini</span>
+                        <span class="song-title">slo-mo</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 인디 Section -->
+        <div class="genre-section">
+            <h2 class="genre-header">인디</h2>
+            <div class="playlist-grid">
+                <a href="https://youtu.be/dgZlLjfh6q4?si=wxkNKN7hCC4EMsC6" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1502773831773-068720bf107f?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">데이먼스 이어</span>
+                        <span class="song-title">yours</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/qcUqqXqerp4?si=n9ESH68QTOIeu5X-" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1513829596324-4bb2800c5efb?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">데이먼스 이어</span>
+                        <span class="song-title">josee!</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/aM2OzkMRPb0?si=LL7J73h5wZ8EkZ9t" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1525662221471-a99ad49c390a?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">카더가든</span>
+                        <span class="song-title">나무</span>
+                    </div>
+                </a>
+                <a href="https://youtu.be/E5BLkMGxDgQ?si=D7BviLp0zLeHzGRx" target="_blank" class="song-card">
+                    <div class="album-art" style="background-image: url('https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&w=200')"></div>
+                    <div class="song-details">
+                        <span class="song-artist">리도어</span>
+                        <span class="song-title">영원은 그렇듯</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 DREAMY PLAYLIST DESIGN</p>
+        </footer>
+    </div>
+
+    <script>
+        function pickRandomSong() {
+            const songCards = document.querySelectorAll('.song-card');
+            if (songCards.length > 0) {
+                const randomIndex = Math.floor(Math.random() * songCards.length);
+                const randomSong = songCards[randomIndex];
+                const title = randomSong.querySelector('.song-title').textContent;
+                const url = randomSong.getAttribute('href');
+                alert('오늘의 추천곡은 [' + title + '] 입니다! 🎵\n\n확인을 누르시면 유튜브로 연결됩니다.');
+                window.open(url, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>

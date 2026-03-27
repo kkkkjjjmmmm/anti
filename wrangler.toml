@@ -1,0 +1,3 @@
+# Cloudflare Pages Deployment Configuration
+name = "my-playlist"
+pages_build_output_dir = "./dist"
